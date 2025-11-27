@@ -1,240 +1,229 @@
-﻿namespace GalacticQuest
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace GalacticQuest
 {
     internal class Program
     {
-        static void Main(string[] args)
+      
+        enum MainMenu
         {
-            Console.WriteLine("Hello, Galactic Quest!");
-
-            OpenMainMenu();
+            Monsters = 1,
+            Travel,
+            Journal,
+            Exit
         }
 
-        internal static void OpenMainMenu()
+        enum TravelOptions
         {
-            bool isAppRunning = true;
+            Explore = 1,
+            SearchForItems,
+            BackToShip
+        }
 
-            while (isAppRunning)
+        enum JournalOptions
+        {
+            Monsters = 1,
+            Planets,
+            Items,
+            Back
+        }
+
+        static void Main(string[] args)
+        {
+          
+            var monsters = InitializeMonsters();
+            bool isRunning = true;
+
+            while (isRunning)
             {
-                Console.WriteLine("\n");
-                Console.WriteLine("Select your option and press Enter: \n 1.Travel \n 2.Journal \n 3.Exit \n");
-                int.TryParse(Console.ReadLine(), out int readOption);
+                ShowMainMenu();
 
+                string input = Console.ReadLine();
+                int.TryParse(input, out int parsedInt);
 
-                switch (readOption)
+                switch (parsedInt)
                 {
-                    case (int)GameOptions.Monsters:
-                        OpenTravelMenu();
+                    case (int)MainMenu.Monsters:
+                        
+                        HandleMonstersMenu(monsters);
                         break;
 
-                    case (int)GameOptions.Journal:
-                        OpenJournalMenu();
+                    case (int)MainMenu.Travel:
+                      
+                        HandleTravelMenu();
                         break;
 
-                    case (int)GameOptions.Exit:
-                        isAppRunning = false;
+                    case (int)MainMenu.Journal:
+                       
+                        HandleJournalMenu();
+                        break;
+
+                    case (int)MainMenu.Exit:
+                        Console.WriteLine("Exiting the game. Goodbye, Captain!");
+                        isRunning = false;
                         break;
 
                     default:
-                        Console.WriteLine("-_-' Invalid Option");
+                        Console.WriteLine("Invalid option. Please try again.");
+                        Console.ReadKey();
                         break;
-
                 }
             }
         }
 
-        internal enum GameOptions
+        static Dictionary<string, (int Health, int Attack)> InitializeMonsters()
         {
-            Monsters = 1,
-            Journal = 2,
-            Exit = 3
-        }
-
-        internal static void OpenTravelMenu()
-        {
-            Console.WriteLine("\n");
-            Console.WriteLine("Select your option and press Enter: \n 1.Explore \n 2.Search For Items \n 3.Back To Ship \n 4.Back To Main Menu\n");
-
-            int.TryParse(Console.ReadLine(), out int readOption);
-
-            switch (readOption)
+            return new Dictionary<string, (int Health, int Attack)>()
             {
-                case 1:
-                    Console.WriteLine("Selected Explore");
-                    break;
-
-                case 2:
-                    Console.WriteLine("Selected Search For Items");
-                    break;
-
-                case 3:
-                    Console.WriteLine("Selected Back To Ship");
-                    break;
-
-                case 4:
-                    break;
-
-                default:
-                    Console.WriteLine("Invalid Option. Please try a valid option.");
-                    break;
-
-            }
-        }
-
-        internal static void OpenJournalMenu()
-        {
-            Console.WriteLine("\n");
-            Console.WriteLine("Select your option and press Enter: \n 1.Monsters \n 2.Planets \n 3.Items \n 4.Back To Main Menu\n");
-
-            int.TryParse(Console.ReadLine(), out int readOption);
-
-            switch (readOption)
-            {
-                case 1:
-                    List<string> monstersWithNames = CreateMonstersWithNames();
-                    Dictionary<string, int> monstersWithHp = CreateMonstersWith("hp", monstersWithNames);
-                    Dictionary<string, int> monstersWithAttack = CreateMonstersWith("attack", monstersWithNames);
-                    ShowMonsters(monstersWithHp, monstersWithAttack);
-                    break;
-
-                case 2:
-                    Console.WriteLine("Selected Planets");
-                    break;
-
-                case 3:
-                    Console.WriteLine("Selected Items");
-                    break;
-
-                case 4:
-                    break;
-
-                default:
-                    Console.WriteLine("Invalid Option. Please try a valid option.");
-                    break;
-            }
-        }
-
-        internal static List<string> CreateMonstersWithNames()
-        {
-            List<string> monstersList = new List<string>
-            {
-                "Glorbazorg",
-                "Xenotutzi",
-                "Ignifax",
-                "Kryostasis",
-                "Nighthorn",
-                "Leviathan-Maw",
-                "Hydro-King Aqueron",
-                "Stonemouth"
+                { "Space Pirate", (150, 25) },
+                { "Galactic Overlord", (300, 50) },
+                { "Cosmic Beast", (250, 40) },
+                { "Nebula Phantom", (200, 35) },
+                { "Astro Wraith", (180, 30) },
+                { "Stellar Serpent", (220, 38) },
+                { "Void Reaper", (275, 45) }
             };
-            return monstersList;
         }
 
-        internal static Dictionary<string, int> CreateMonstersWith(string hpOrAttack, List<string> monstersList)
+      
+        static void ShowMainMenu()
         {
-            Dictionary<string, int> monstersDictionary = new Dictionary<string, int>();
-            Random randomGenerator = new Random();
+        
+            Console.WriteLine("GALACTIC QUEST - MAIN MENU");
+            Console.WriteLine("Select One Option:");
+            Console.WriteLine("1. Monsters");
+            Console.WriteLine("2. Travel");
+            Console.WriteLine("3. Journal");
+            Console.WriteLine("4. Exit");
+            Console.Write("Input: ");
+        }
 
-            for (int i = 0; i < monstersList.Count; ++i)
+      
+        static void HandleMonstersMenu(Dictionary<string, (int Health, int Attack)> monsters)
+        {
+            bool inMonsterMenu = true;
+            while (inMonsterMenu)
             {
-                string monsterKey = monstersList[i];
-                int monsterValue = 0; // default value
 
-                if (hpOrAttack == "hp")
+                foreach (var monster in monsters)
                 {
-                    monsterValue = randomGenerator.Next(10, 100);
+                    Console.WriteLine($"Name: {monster.Key}, Health: {monster.Value.Health}, Attack: {monster.Value.Attack}");
                 }
-                else if (hpOrAttack == "attack")
+               
+                Console.WriteLine("1. Filter by name");
+                Console.WriteLine("2. Back to Main Menu");
+                Console.Write("Choice: ");
+
+                string choice = Console.ReadLine();
+
+                if (choice == "1")
                 {
-                    monsterValue = randomGenerator.Next(1, 20);
-                }
+                    Console.Write("Enter the name to filter: ");
+                    string filterName = Console.ReadLine();
 
-                monstersDictionary.Add(monsterKey, monsterValue);
-            }
+                    var filteredMonsters = monsters.Where(m => m.Key.Contains(filterName, StringComparison.OrdinalIgnoreCase));
 
-            return monstersDictionary;
-        }
-
-        internal static void ShowMonsters(Dictionary<string, int> monstersWithHp, Dictionary<string, int> monstersWithAttack)
-        {
-            Console.WriteLine("The monsters are : ");
-
-            for (int index = 0; index < monstersWithHp.Count; ++index)
-            {
-                Console.WriteLine(monstersWithHp.Keys.ElementAt(index) + " - " + monstersWithHp.Values.ElementAt(index) + " HP");
-            }
-            Console.WriteLine("\n");
-
-            for (int index = 0; index < monstersWithAttack.Count; ++index)
-            {
-                Console.WriteLine(monstersWithAttack.Keys.ElementAt(index) + " - " + monstersWithAttack.Values.ElementAt(index) + " ATT");
-            }
-            Console.WriteLine("\n");
-
-            ShowMonstersOptions(monstersWithHp);
-        }
-
-        internal static void ShowMonstersOptions(Dictionary<string, int> monstersWithHp)
-        {
-            Console.WriteLine("Press 1 to go back or 2 to filter monsters based on name");
-
-            int.TryParse(Console.ReadLine(), out int userOption);
-            switch (userOption)
-            {
-                case 1:
-                    break;
-
-                case 2:
-                    FilterMonstersByName(monstersWithHp);
-                    break;
-
-                default:
-                    Console.WriteLine("Invalid Option. Please try a valid option.");
-                    break;
-            }
-        }
-
-        internal static void FilterMonstersByName(Dictionary<string, int> monstersWithHp)
-        {
-            Console.WriteLine("Enter letters to filter monsters: ");
-            string? userInput = Console.ReadLine();
-
-            Console.WriteLine("\n");
-
-            Dictionary<string, int> filteredMonstersByName = new Dictionary<string, int>();
-            if (!string.IsNullOrEmpty(userInput))
-            {
-                string lowerCasedUserInput = userInput.ToLower();
-                for (int index = 0; index < monstersWithHp.Count; ++index)
-                {
-                    string currentMonsterName = monstersWithHp.Keys.ElementAt(index);
-                    string lowerCasedCurrentMonster = currentMonsterName.ToLower();
-
-                    if (lowerCasedCurrentMonster.Contains(lowerCasedUserInput))
+                    Console.WriteLine(" Search Results :");
+                    if (filteredMonsters.Any())
                     {
-                        int currentMonsterHp = monstersWithHp[currentMonsterName];
-                        filteredMonstersByName.Add(currentMonsterName, currentMonsterHp);
+                        foreach (var monster in filteredMonsters)
+                        {
+                            Console.WriteLine($"Name: {monster.Key}, Health: {monster.Value.Health}, Attack: {monster.Value.Attack}");
+                        }
                     }
+                    else
+                    {
+                        Console.WriteLine("No monsters found.");
+                        Console.WriteLine( "All Monsters :");
+                        foreach (var monster in monsters)
+                        {
+                            Console.WriteLine($"Name: {monster.Key}, Health: {monster.Value.Health}, Attack: {monster.Value.Attack}");
+                        }
+                    }
+                    Console.WriteLine("Press any key to continue...");
+                    Console.ReadKey();
+                }
+                else if (choice == "2")
+                {
+                    inMonsterMenu = false;
                 }
             }
-            else
-            {
-                Console.WriteLine("No input provided. Showing all monsters. \n");
+        }
 
-                for (int index = 0; index < monstersWithHp.Count; ++index)
+        static void HandleTravelMenu()
+        {
+            bool inTravelMenu = true;
+            while (inTravelMenu)
+            {
+               
+                Console.WriteLine("1. Explore");
+                Console.WriteLine("2. Search For Items");
+                Console.WriteLine("3. Back To Ship");
+                Console.Write("Choice: ");
+
+                string travelInput = Console.ReadLine();
+                int.TryParse(travelInput, out int travelChoice);
+
+                switch (travelChoice)
                 {
-                    Console.WriteLine(monstersWithHp.Keys.ElementAt(index));
+                    case (int)TravelOptions.Explore:
+                        Console.WriteLine("Selected Explore"); ;
+                        Console.ReadKey();
+                        break;
+                    case (int)TravelOptions.SearchForItems:
+                        Console.WriteLine("Selected Search For Items");
+                        Console.ReadKey();
+                        break;
+                    case (int)TravelOptions.BackToShip:
+                        inTravelMenu = false;
+                        break;
+                    default:
+                        Console.WriteLine("Invalid travel option.");
+                        Console.ReadKey();
+                        break;
                 }
             }
+        }
 
-            if (filteredMonstersByName.Count == 0)
+        // 5. Logica pentru Meniul Journal
+        static void HandleJournalMenu()
+        {
+            bool inJournalMenu = true;
+            while (inJournalMenu)
             {
-                Console.WriteLine("None of the monsters starts with these letters. \n");
-            }
-            else
-            {
-                for (int index = 0; index < filteredMonstersByName.Count; ++index)
+               
+                Console.WriteLine("1. Monsters");
+                Console.WriteLine("2. Planets");
+                Console.WriteLine("3. Items");
+                Console.WriteLine("4. Back");
+                Console.Write("Choice: ");
+
+                string journalInput = Console.ReadLine();
+                int.TryParse(journalInput, out int journalChoice);
+
+                switch (journalChoice)
                 {
-                    Console.WriteLine(filteredMonstersByName.Keys.ElementAt(index) + " - " + filteredMonstersByName.Values.ElementAt(index) + " HP");
+                    case (int)JournalOptions.Monsters:
+                        Console.WriteLine("Selected Monsters");
+                        Console.ReadKey();
+                        break;
+                    case (int)JournalOptions.Planets:
+                        Console.WriteLine("Selected Planets");
+                        Console.ReadKey();
+                        break;
+                    case (int)JournalOptions.Items:
+                        Console.WriteLine("Selected Items");
+                        Console.ReadKey();
+                        break;
+                    case (int)JournalOptions.Back:
+                        inJournalMenu = false;
+                        break;
+                    default:
+                        Console.WriteLine("Invalid journal option.");
+                        Console.ReadKey();
+                        break;
                 }
             }
         }
