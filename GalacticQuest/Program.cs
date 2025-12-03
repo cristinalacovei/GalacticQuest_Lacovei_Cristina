@@ -38,26 +38,33 @@
                 int.TryParse(Console.ReadLine(), out int readOption);
 
 
-                switch (readOption)
+                try
                 {
-                    case (int)GameOptions.Monsters:
-                        OpenTravelMenu();
-                        break;
+                    switch (readOption)
+                    {
+                        case (int)GameOptions.Monsters:
+                            OpenTravelMenu();
+                            break;
 
-                    case (int)GameOptions.Journal:
-                        OpenJournalMenu();
-                        break;
+                        case (int)GameOptions.Journal:
+                            OpenJournalMenu();
+                            break;
 
-                    case (int)GameOptions.Exit:
-                        isAppRunning = false;
-                        break;
+                        case (int)GameOptions.Exit:
+                            isAppRunning = false;
+                            break;
 
-                    default:
-                        Console.WriteLine("-_-' Invalid Option");
-                        break;
+                        default:
+                            throw new Exception("Invalid Option. Please try a valid option.");
 
+                    }
                 }
-            }
+
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"There was an error: {ex.Message}");
+                }
+                }
         }
 
         internal enum GameOptions
