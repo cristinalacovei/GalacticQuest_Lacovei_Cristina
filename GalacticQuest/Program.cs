@@ -1,4 +1,9 @@
-﻿namespace GalacticQuest
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using GalacticQuest.Models;
+
+namespace GalacticQuest
 {
     internal class Program
     {
@@ -8,18 +13,42 @@
 
             CreateAndDisplayPlayerStats();
 
+            CreateAndDisplayMonsterStats();
+
             OpenMainMenu();
+        }
+
+        internal static void CreateAndDisplayMonsterStats()
+        {
+            List<Models.Monster> monsters = new List<Models.Monster>()
+            {
+                new Models.Vioraptoru(),
+                new Models.Tinelatoru()
+            };
+
+            foreach (var monster in monsters)
+            {
+                Console.Write("\n");
+
+                Console.WriteLine($"Monster Name: {monster.Name}");
+                Console.WriteLine($"Monster HP: {monster.Hp}");
+                Console.WriteLine($"Monster Attack: {monster.Attack}");
+                monster.OnDeath();
+                Console.Write("\n");
+            }
         }
 
         private static void CreateAndDisplayPlayerStats()
         {
             Console.Write("\n");
 
-            List<(string, int)> items = new List<(string, int)>() { ("Excalibur", 500), ("Tessaiga", 1000) };
+            List<Models.Item> items = new List<Models.Item>()
+            {
+                new Models.Excalibur(),
+                new Models.Tessaiga()
+            };
+
             Player player = new Player(50, 1, items);
-            //Player player = new Player(40, 2);
-            //Player player = new Player(30);
-            //Player player = new Player();
 
             player.ShowProfile();
 
@@ -36,7 +65,6 @@
                 Console.Write("\n");
                 Console.WriteLine("Select your option and press Enter: \n 1.Travel \n 2.Journal \n 3.Exit \n");
                 int.TryParse(Console.ReadLine(), out int readOption);
-
 
                 switch (readOption)
                 {
@@ -55,7 +83,6 @@
                     default:
                         Console.WriteLine("-_-' Invalid Option");
                         break;
-
                 }
             }
         }
@@ -94,7 +121,6 @@
                 default:
                     Console.WriteLine("Invalid Option. Please try a valid option.");
                     break;
-
             }
         }
 
@@ -108,10 +134,8 @@
             switch (readOption)
             {
                 case 1:
-                    List<string> monstersWithNames = CreateMonstersWithNames();
-                    Dictionary<string, int> monstersWithHp = CreateMonstersWith("hp", monstersWithNames);
-                    Dictionary<string, int> monstersWithAttack = CreateMonstersWith("attack", monstersWithNames);
-                    ShowMonsters(monstersWithHp, monstersWithAttack);
+                    List<Models.Monster> allMonsters = CreateMonstersList();
+                    ShowMonsters(allMonsters);
                     break;
 
                 case 2:
@@ -131,67 +155,32 @@
             }
         }
 
-        internal static List<string> CreateMonstersWithNames()
+        internal static List<Models.Monster> CreateMonstersList()
         {
-            List<string> monstersList = new List<string>
+            List<Models.Monster> monsters = new List<Models.Monster>()
             {
-                "Glorbazorg",
-                "Xenotutzi",
-                "Ignifax",
-                "Kryostasis",
-                "Nighthorn",
-                "Leviathan-Maw",
-                "Hydro-King Aqueron",
-                "Stonemouth"
+                new Models.Vioraptoru(),
+                new Models.Tinelatoru(),
+                new Models.HydraMax(),
+                new Models.StoneGoblin()
             };
-            return monstersList;
+            return monsters;
         }
 
-        internal static Dictionary<string, int> CreateMonstersWith(string hpOrAttack, List<string> monstersList)
+        internal static void ShowMonsters(List<Models.Monster> monsters)
         {
-            Dictionary<string, int> monstersDictionary = new Dictionary<string, int>();
-            Random randomGenerator = new Random();
+            Console.WriteLine("The monsters are: ");
 
-            for (int i = 0; i < monstersList.Count; ++i)
+            for (int index = 0; index < monsters.Count; ++index)
             {
-                string monsterKey = monstersList[i];
-                int monsterValue = 0; // default value
-
-                if (hpOrAttack == "hp")
-                {
-                    monsterValue = randomGenerator.Next(10, 100);
-                }
-                else if (hpOrAttack == "attack")
-                {
-                    monsterValue = randomGenerator.Next(1, 20);
-                }
-
-                monstersDictionary.Add(monsterKey, monsterValue);
-            }
-
-            return monstersDictionary;
-        }
-
-        internal static void ShowMonsters(Dictionary<string, int> monstersWithHp, Dictionary<string, int> monstersWithAttack)
-        {
-            Console.WriteLine("The monsters are : ");
-
-            for (int index = 0; index < monstersWithHp.Count; ++index)
-            {
-                Console.WriteLine(monstersWithHp.Keys.ElementAt(index) + " - " + monstersWithHp.Values.ElementAt(index) + " HP");
+                Console.WriteLine($"{monsters[index].Name} - {monsters[index].Hp} HP - {monsters[index].Attack} ATT");
             }
             Console.Write("\n");
 
-            for (int index = 0; index < monstersWithAttack.Count; ++index)
-            {
-                Console.WriteLine(monstersWithAttack.Keys.ElementAt(index) + " - " + monstersWithAttack.Values.ElementAt(index) + " ATT");
-            }
-            Console.Write("\n");
-
-            ShowMonstersOptions(monstersWithHp);
+            ShowMonstersOptions(monsters);
         }
 
-        internal static void ShowMonstersOptions(Dictionary<string, int> monstersWithHp)
+        internal static void ShowMonstersOptions(List<Models.Monster> monsters)
         {
             Console.WriteLine("Press 1 to go back or 2 to filter monsters based on name");
 
@@ -200,62 +189,48 @@
             {
                 case 1:
                     break;
-
                 case 2:
-                    FilterMonstersByName(monstersWithHp);
+                    FilterMonstersByName(monsters);
                     break;
-
                 default:
                     Console.WriteLine("Invalid Option. Please try a valid option.");
                     break;
             }
         }
 
-        internal static void FilterMonstersByName(Dictionary<string, int> monstersWithHp)
+        internal static void FilterMonstersByName(List<Models.Monster> monsters)
         {
             Console.WriteLine("Enter letters to filter monsters: ");
             string? userInput = Console.ReadLine();
 
             Console.Write("\n");
 
-            Dictionary<string, int> filteredMonstersByName = new Dictionary<string, int>();
-            if (!string.IsNullOrEmpty(userInput))
-            {
-                string lowerCasedUserInput = userInput.ToLower();
-                for (int index = 0; index < monstersWithHp.Count; ++index)
-                {
-                    string currentMonsterName = monstersWithHp.Keys.ElementAt(index);
-                    string lowerCasedCurrentMonster = currentMonsterName.ToLower();
-
-                    if (lowerCasedCurrentMonster.Contains(lowerCasedUserInput))
-                    {
-                        int currentMonsterHp = monstersWithHp[currentMonsterName];
-                        filteredMonstersByName.Add(currentMonsterName, currentMonsterHp);
-                    }
-                }
-            }
-            else
+            if (string.IsNullOrEmpty(userInput))
             {
                 Console.WriteLine("No input provided. Showing all monsters.");
                 Console.Write("\n");
-
-                for (int index = 0; index < monstersWithHp.Count; ++index)
-                {
-                    Console.WriteLine(monstersWithHp.Keys.ElementAt(index));
-                }
+                ShowMonsters(monsters);
+                return;
             }
 
-            if (filteredMonstersByName.Count == 0)
+            string lowerCasedUserInput = userInput.ToLower();
+
+            List<Models.Monster> filteredMonsters = monsters
+                                                     .Where(m => m.Name.ToLower().Contains(lowerCasedUserInput))
+                                                     .ToList();
+
+            if (filteredMonsters.Count == 0)
             {
-                Console.WriteLine("None of the monsters starts with these letters.");
+                Console.WriteLine("None of the monsters contain these letters.");
                 Console.Write("\n");
             }
             else
             {
-                for (int index = 0; index < filteredMonstersByName.Count; ++index)
+                for (int index = 0; index < filteredMonsters.Count; ++index)
                 {
-                    Console.WriteLine(filteredMonstersByName.Keys.ElementAt(index) + " - " + filteredMonstersByName.Values.ElementAt(index) + " HP");
+                    Console.WriteLine($"{filteredMonsters[index].Name} - {filteredMonsters[index].Hp} HP - {filteredMonsters[index].Attack} ATT");
                 }
+                Console.Write("\n");
             }
         }
     }
