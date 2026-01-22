@@ -23,17 +23,17 @@ namespace GalacticQuest
             Console.WriteLine("Displaying Created Items:");
 
             Random randomGenerator = new Random();
-            List<Item> items = new List<Item>()
+            IList<Item> items = new List<Item>()
             {
                 new Excalibur("Excalibur", randomGenerator.Next(50, 200), randomGenerator.Next(100, 200)),
                 new Tessaiga ("Tessaiga", randomGenerator.Next(100, 300), randomGenerator.Next(50, 100)),
             };
 
-            for (int index = 0; index < items.Count; ++index)
+            foreach (Item item in items)
             {
-                Console.WriteLine($"Item: {items[index].Name} | Attack: {items[index].Attack} | Resistance: {items[index].Resitance}");
+                Console.WriteLine($"Item: {item.Name} | Attack: {item.Attack} | Resistance: {item.Resitance}");
                 Console.WriteLine("Item's Special Power: ");
-                items[index].SpecialPower();
+                item.SpecialPower();
             }
         }
 
@@ -74,6 +74,7 @@ namespace GalacticQuest
                     switch (readOption)
                     {
                         case 1:
+                            PlanetHelper.TravelToRandomPlanet();
                             OpenTravelMenu();
                             break;
 
@@ -113,7 +114,7 @@ namespace GalacticQuest
             {
                 case 1:
                     Console.WriteLine("Selected Explore");
-                    PlanetHelper.TravelToRandomPlanet();
+                    PlanetHelper.ExplorePlanet();
                     break;
 
                 case 2:
@@ -171,7 +172,7 @@ namespace GalacticQuest
          Console.WriteLine("Displaying Created Monsters:");
 
          Random randomGenerator = new Random();
-         List<Monster> monsters = new List<Monster>()
+            IList<Monster> monsters = new List<Monster>()
             {
                 new Glorbazorg("Glorbazorg", randomGenerator.Next(10, 100), randomGenerator.Next(10, 100)),
                 new Xenotutzi("Xenotutzi", randomGenerator.Next(10, 100), randomGenerator.Next(10, 100)),
@@ -179,24 +180,24 @@ namespace GalacticQuest
                 new Ignifax("Ignifax", randomGenerator.Next(10, 100), randomGenerator.Next(10, 100))
             };
 
-         ShowMonsters(monsters);
+            ShowMonsters(monsters);
       }
 
-      internal static void ShowMonsters(List<Monster> monsters)
+      internal static void ShowMonsters(IList<Monster> monsters)
         {
             Console.Write("\n");
             Console.WriteLine("The monsters are : ");
 
-            for (int index = 0; index < monsters.Count; ++index)
+            foreach (Monster monster in monsters)
             {
-                Console.WriteLine(monsters[index].Name + " - " + monsters[index].Hp + " HP | " + monsters[index].Attack + " Attack");
+                Console.WriteLine(monster.Name + " - " + monster.Hp + " HP | " + monster.Attack + " Attack");
             }
             Console.Write("\n");
 
             ShowMonstersOptions(monsters);
         }
 
-        internal static void ShowMonstersOptions(List<Monster> monsters)
+        internal static void ShowMonstersOptions(IList<Monster> monsters)
         {
             Console.WriteLine("Select your option and press Enter: \n 1.Go Back \n 2.Filter Monsters By Name \n 3.Show Monsters Last Words\n");
 
@@ -249,26 +250,25 @@ namespace GalacticQuest
             }
          }
 
-      internal static void FilterMonstersByName(List<Monster> monsters)
+      internal static void FilterMonstersByName(IList<Monster> monsters)
         {
             Console.WriteLine("Enter letters to filter monsters: ");
             string? userInput = Console.ReadLine();
 
             Console.Write("\n");
 
-            Dictionary<string, int> filteredMonstersByName = new Dictionary<string, int>();
+            IDictionary<string, int> filteredMonstersByName = new Dictionary<string, int>();
             if (!string.IsNullOrEmpty(userInput))
             {
                 string lowerCasedUserInput = userInput.ToLower();
-                for (int index = 0; index < monsters.Count; ++index)
+                foreach (Monster monster in monsters)
                 {
-                    string currentMonsterName = monsters[index].Name;
+                    string currentMonsterName = monster.Name;
                     string lowerCasedCurrentMonster = currentMonsterName.ToLower();
 
                     if (lowerCasedCurrentMonster.StartsWith(lowerCasedUserInput))
                     {
-                        int currentMonsterHp = monsters[index].Hp;
-                        filteredMonstersByName.Add(currentMonsterName, currentMonsterHp);
+                        filteredMonstersByName.Add(currentMonsterName, monster.Hp);
                     }
                 }
             }
@@ -277,9 +277,9 @@ namespace GalacticQuest
                 Console.WriteLine("No input provided. Showing all monsters.");
                 Console.Write("\n");
 
-                for (int index = 0; index < monsters.Count; ++index)
+                foreach (Monster monster in monsters)
                 {
-                    Console.WriteLine(monsters[index].Name);
+                    Console.WriteLine(monster.Name);
                 }
             }
 
@@ -290,20 +290,20 @@ namespace GalacticQuest
             }
             else
             {
-                for (int index = 0; index < filteredMonstersByName.Count; ++index)
+                foreach (KeyValuePair<string, int> entry in filteredMonstersByName)
                 {
-                    Console.WriteLine(filteredMonstersByName.Keys.ElementAt(index) + " - " + filteredMonstersByName.Values.ElementAt(index) + " HP");
+                    Console.WriteLine(entry.Key + " - " + entry.Value + " HP");
                 }
             }
         }
 
-        internal static void ShowMonstersLastWords(List<Monster> monsters)
+        internal static void ShowMonstersLastWords(IList<Monster> monsters)
         {
             Console.WriteLine("Monsters' Last Words:");
 
-            for (int index = 0; index < monsters.Count; ++index)
+            foreach (Monster monster in monsters)
             {
-                monsters[index].OnDeath();
+                monster.OnDeath();
             }
         }
     }

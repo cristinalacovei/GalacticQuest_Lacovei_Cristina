@@ -9,7 +9,7 @@ namespace GalacticQuest
         public int Hp { get; private set; } = 100;
         public int Attack { get; private set; } = 10;
 
-        public List<Item> Backpack { get; private set; } = new List<Item>();
+        public IList<Item> Backpack { get; private set; } = new List<Item>();
         public int Credits { get; private set; } = 0;
 
         public Player(int hp, int attack, int credits)
@@ -117,9 +117,9 @@ namespace GalacticQuest
 
             Console.WriteLine($"Player Attack: {Attack}");
             int playerTotalAttack = Attack;
-            for (int index = 0; index < Backpack.Count; ++index)
+            foreach (Item item in Backpack)
             {
-                playerTotalAttack += Backpack[index].Attack;
+                playerTotalAttack += item.Attack;
             }
 
             Console.WriteLine($"Player Attack (Combined With Items Attack): {playerTotalAttack}");

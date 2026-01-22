@@ -6,42 +6,94 @@ namespace GalacticQuest.Planets
 {
    internal static class PlanetHelper
    {
-      internal static readonly List<IPlanet> PLANETS_LIST = new List<IPlanet>() { new PlanetMeridian(), new PlanetNibiru(), new PlanetVespera() };
-
-      internal static readonly Random RandomNumberGenerator = new Random();
+        internal static readonly IList<IPlanet> PLANETS_LIST = new List<IPlanet>()
+      {
+          new PlanetMeridian(),
+          new PlanetNibiru(),
+          new PlanetVespera()
+      };
+        internal static readonly Random RandomNumberGenerator = new Random();
 
       private const int ITEM_DROP_PROBABILITY_FROM_PLANET = 35;
 
       private static int _currentPlanetIndex = -1;
 
-      /// <summary>
-      /// Randomly travels to one of the planets found in the PLANETS_LIST
-      /// </summary>
-      internal static void TravelToRandomPlanet()
-      {
-         // random number generator takes an exclusive upper bound as second argument -> so for (0,3) it will pick from integers 0 1 2
-         int randomPlanetIndex = RandomNumberGenerator.Next(0, PLANETS_LIST.Count);
-         IPlanet chosenPlanet = PLANETS_LIST.ElementAt(randomPlanetIndex);
+        /// <summary>
+        /// Selects a random planet and updates the current location.
+        /// Call this when entering the Travel menu.
+        /// </summary>
+        internal static void TravelToRandomPlanet()
+        {
+            int randomPlanetIndex = RandomNumberGenerator.Next(0, PLANETS_LIST.Count);
+            _currentPlanetIndex = randomPlanetIndex;
+            IPlanet chosenPlanet = PLANETS_LIST[randomPlanetIndex];
 
-         _currentPlanetIndex = randomPlanetIndex;
-         Console.WriteLine($" You travelled to planet : {chosenPlanet.GetType().ToString().Split(".").Last()} ");
+            Console.WriteLine("Engaging Hyper-drive...");
+            Console.WriteLine($"You arrived at planet: {chosenPlanet.GetType().Name.Split('.').Last()}");
+        }
 
-         Monster? randomMonster = ChooseRandomMonsterFromPlanet(chosenPlanet);
+        /// <summary>
+        /// Explores the current planet to find a monster and initiates combat.
+        /// Call this when selecting "Explore".
+        /// </summary>
+        internal static void ExplorePlanet()
+        {
+            if (_currentPlanetIndex == -1)
+            {
+                Console.WriteLine("You are floating in space! Travel to a planet first.");
+                return;
+            }
 
-         if (randomMonster is null)
-         {
-            Console.WriteLine("Unfortunately no monsters live on this planet :( ");
-            return;
-         }
+            IPlanet currentPlanet = PLANETS_LIST[_currentPlanetIndex];
+            Monster? randomMonster = ChooseRandomMonsterFromPlanet(currentPlanet);
 
-         Console.WriteLine($" You have encountered a monster of type : {randomMonster.GetType().ToString().Split(".").Last()}, called by their name {randomMonster?.Name} with {randomMonster?.Hp} HP ");
-      }
+            if (randomMonster is null)
+            {
+                Console.WriteLine("Unfortunately no monsters live on this planet :( ");
+                return;
+            }
 
+            Console.WriteLine($"You have encountered a {randomMonster.GetType().Name.Split('.').Last()} named {randomMonster.Name} (HP: {randomMonster.Hp}, Attack: {randomMonster.Attack})");
 
-      /// <summary>
-      /// Searches for a random item/s and displays what item/s the player received
-      /// </summary>
-      internal static void SearchForItems()
+            // Start the battle simulation
+            PerformSimpleBattle(randomMonster);
+        }
+
+        /// <summary>
+        /// Simulates a simple dice-roll battle based on attack power.
+        /// </summary>
+        private static void PerformSimpleBattle(Monster monster)
+        {
+            Console.WriteLine("\n--- BATTLE STARTED ---");
+
+            // Generate random numbers from 0 to Attack (inclusive)
+            // Random.Next(min, max) is exclusive on the upper bound, so we add 1
+            int playerRoll = RandomNumberGenerator.Next(0, Program.currentPlayer.Attack + 1);
+            int monsterRoll = RandomNumberGenerator.Next(0, monster.Attack + 1);
+
+            Console.WriteLine($"Player rolls: {playerRoll} (Max Potential: {Program.currentPlayer.Attack})");
+            Console.WriteLine($"{monster.Name} rolls: {monsterRoll} (Max Potential: {monster.Attack})");
+
+            if (playerRoll > monsterRoll)
+            {
+                Console.WriteLine("Victory! Your attack overpowered the monster!");
+            }
+            else if (monsterRoll > playerRoll)
+            {
+                Console.WriteLine("Defeat! The monster's attack was stronger.");
+            }
+            else
+            {
+                Console.WriteLine("Stalemate! Both attacks clashed with equal force.");
+            }
+
+            Console.WriteLine("--- BATTLE ENDED ---\n");
+        }
+
+        /// <summary>
+        /// Searches for a random item/s and displays what item/s the player received
+        /// </summary>
+        internal static void SearchForItems()
       {
          int randomProbability = RandomNumberGenerator.Next(0, 100);
 
